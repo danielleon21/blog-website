@@ -2,6 +2,9 @@
 
 import express from 'express'
 import ejs from 'ejs';
+import _ from "lodash"
+
+let posts = []
 
 const homeStartingContent = "Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing.";
 const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pellentesque. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Non diam phasellus vestibulum lorem sed. Platea dictumst quisque sagittis purus sit. Egestas sed sed risus pretium quam vulputate dignissim suspendisse. Mauris in aliquam sem fringilla. Semper risus in hendrerit gravida rutrum quisque non tellus orci. Amet massa vitae tortor condimentum lacinia quis vel eros. Enim ut tellus elementum sagittis vitae. Mauris ultrices eros in cursus turpis massa tincidunt dui.";
@@ -14,15 +17,40 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+app.get('/', (req, res) => {
+  res.render('home', { startingContent: homeStartingContent, posts })
+})
 
+app.get('/about', (req, res) => {
+  res.render('about', { startingContent: aboutContent })
+})
 
+app.get('/contact', (req, res) => {
+  res.render('contact', { startingContent: contactContent })
+})
 
+app.get('/compose', (req, res) => {
+  res.render('compose')
+})
 
+app.post('/compose', (req, res) => {
+  const { postTitle, postBody } = req.body
+  const post = {
+    title: postTitle,
+    content: postBody
+  }
+  posts = [...posts, post]
+  res.redirect('/')
+})
 
-
-
-
-
+app.get('/post/:postName', (req, res) => {
+  const postName = _.lowerCase(req.params.postName)
+  const post = posts.filter(post => _.lowerCase(post.title) == postName)
+  if (post) {
+    const { title, content } = post[0]
+    res.render('post', { title, content })
+  }
+})
 
 
 
